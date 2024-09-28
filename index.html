@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz : Le Modèle Ricardien</title>
+    <style>
+        body {
+            font-family: 'Mayan', sans-serif;
+            margin: 0;
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+            text-align: center;
+        }
+        .quiz-container, .summary {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            background-image: url('images/back.jpg.webp');
+            background-size: cover;
+            background-position: center;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #000;
+        }
+        .choices {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin-left: 20%;
+        }
+        .choices li {
+            margin: 8px 0;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #FF0000;
+            color: white;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #CC0000;
+        }
+        .summary {
+            display: none;
+        }
+        .summary ul {
+            list-style: none;
+            padding: 0;
+        }
+        .summary li {
+            text-align: left;
+            margin-left: 20%;
+            margin-bottom: 10px;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+        .score {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .quiz-container, .summary {
+                max-width: 90%;
+                margin: 20px auto;
+                padding: 15px;
+                border-radius: 10px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            .quiz-container, .summary {
+                padding: 10px;
+                margin: 10px;
+                border-radius: 10px;
+            }
+            .question {
+                font-size: 16px;
+            }
+            button {
+                font-size: 12px;
+                padding: 6px 12px;
+                border-radius: 10px;
+            }
+        }
+        @media (min-width: 1024px) {
+            .quiz-container, .summary {
+                max-width: 800px;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container" id="quiz-container">
+    <h2>QCM ENTRAINEMENT - Le Modèle Ricardien</h2>
+    <div id="question-container">
+        <!-- Les questions seront affichées ici dynamiquement -->
+    </div>
+    <button id="next-button" onclick="nextQuestion()">Suivant</button>
+</div>
+
+<div class="summary" id="summary">
+    <h3>Récapitulatif</h3>
+    <ul id="summary-list">
+        <!-- Le récapitulatif des réponses sera affiché ici -->
+    </ul>
+    <div class="score" id="score"></div>
+    <button onclick="restartQuiz()">Recommencer</button>
+</div>
+
+<script>
+    const quizData = [
+        { question: "Quel est l'objectif principal du modèle ricardien ?", choices: ["Expliquer les flux migratoires", "Expliquer les différences de coûts de l'offshoring", "Expliquer les gains à l'échange basés sur les différences de productivité du travail", "Expliquer la réduction des coûts de production dans les pays en voie de développement"], correct: 2 },
+        { question: "Qu'est-ce que le coût d'opportunité dans le modèle ricardien ?", choices: ["Le prix payé pour un produit", "La quantité de biens à laquelle on renonce pour produire un autre bien", "Le coût total de production d'un bien", "Le coût des matières premières utilisées"], correct: 1 },
+        { question: "Dans un exemple du modèle ricardien, si l'UE produit 10 000 voitures ou 10 millions de chemises, quel bien devrait-elle produire selon l'avantage comparatif ?", choices: ["Voitures", "Chemises", "Les deux", "Aucun des deux"], correct: 0 },
+        { question: "Quels sont les deux biens utilisés dans l'exemple d'économie à un facteur du modèle ricardien ?", choices: ["Le pétrole et le gaz", "Le vin et le fromage", "Les voitures et les vêtements", "Les ordinateurs et les téléphones"], correct: 1 },
+        { question: "Dans le modèle ricardien, comment les travailleurs décident-ils dans quel secteur travailler ?", choices: ["En fonction de leur formation", "En fonction de leur localisation géographique", "En fonction des salaires les plus élevés", "En fonction de la demande du marché"], correct: 2 },
+        { question: "Qu'est-ce que l'avantage comparatif ?", choices: ["La capacité d'un pays à produire un bien avec moins de coûts absolus qu'un autre pays", "La capacité d'un pays à produire un bien plus efficacement, même s'il n'est pas le meilleur dans tous les secteurs", "La capacité d'un pays à importer plus qu'il n'exporte", "La capacité d'un pays à limiter ses importations"], correct: 1 },
+        { question: "Quelle est l'une des hypothèses du modèle ricardien ?", choices: ["L'économie mondiale est composée de plusieurs pays", "Le travail est le seul facteur de production", "Les capitaux sont mobiles entre les secteurs", "Le commerce international est limité"], correct: 1 },
+        { question: "Comment calcule-t-on le coût d'opportunité dans le modèle ricardien ?", choices: ["En calculant les salaires moyens dans chaque secteur", "En mesurant combien de vin est sacrifié pour produire du fromage", "En mesurant le coût total des matières premières", "En analysant les taxes douanières"], correct: 1 },
+        { question: "Dans une situation de commerce international selon le modèle ricardien, que se passe-t-il si le prix relatif du fromage dépasse le coût d'opportunité de sa production ?", choices: ["Le pays se spécialise dans la production de vin", "Le pays domestique se spécialise dans la production de fromage", "Le pays étranger se spécialise dans la production de fromage", "Les deux pays cessent de produire du fromage"], correct: 1 },
+        { question: "Que se passe-t-il pour les travailleurs étrangers lorsque le prix relatif du vin augmente avec le commerce international ?", choices: ["Ils se spécialisent dans la production de fromage", "Ils cessent de travailler", "Ils se spécialisent dans la production de vin pour obtenir un meilleur rendement financier", "Ils migrent vers d'autres secteurs"], correct: 2 },
+        { question: "Que montre la frontière des possibilités de production dans le modèle ricardien ?", choices: ["La limite des biens que l'économie peut consommer", "La quantité de biens que l'économie peut produire en utilisant toutes ses ressources", "La courbe des coûts d'importation", "La proportion entre importations et exportations"], correct: 1 },
+        { question: "Quel est l'impact du commerce international selon le modèle ricardien ?", choices: ["Il entraîne une réduction des salaires", "Il permet aux pays de se spécialiser et d'augmenter la production totale", "Il limite l'accès aux ressources pour certains pays", "Il crée des conflits entre les pays"], correct: 1 },
+        { question: "Pourquoi le modèle ricardien est-il simplificateur ?", choices: ["Parce qu'il inclut tous les facteurs de production", "Parce qu'il repose sur l'hypothèse d'un seul facteur de production et de la concurrence parfaite", "Parce qu'il se concentre uniquement sur les coûts des matières premières", "Parce qu'il ignore les avantages comparatifs"], correct: 1 },
+        { question: "Quel facteur est utilisé pour déterminer la spécialisation dans le modèle ricardien ?", choices: ["Le coût absolu de production", "Le coût d'opportunité", "Les subventions gouvernementales", "Le niveau de vie des travailleurs"], correct: 1 },
+        { question: "Quels sont les principaux gains à l'échange selon le modèle ricardien ?", choices: ["L'augmentation des salaires dans les deux secteurs", "La réduction des coûts d'importation", "L'augmentation de la production mondiale et la spécialisation efficace", "La réduction des écarts entre les coûts de production"], correct: 2 }
+    ];
+
+    let currentQuestionIndex = 0;
+    let selectedAnswers = [];
+
+    function loadQuestion() {
+        const container = document.getElementById('question-container');
+        container.innerHTML = '';
+
+        const questionData = quizData[currentQuestionIndex];
+        const questionElem = document.createElement('div');
+        questionElem.className = 'question';
+        questionElem.textContent = questionData.question;
+
+        const choicesElem = document.createElement('ul');
+        choicesElem.className = 'choices';
+
+        questionData.choices.forEach((choice, index) => {
+            const choiceElem = document.createElement('li');
+            const choiceInput = document.createElement('input');
+            choiceInput.type = 'radio';
+            choiceInput.name = 'choice';
+            choiceInput.value = index;
+            choiceInput.id = `choice${index}`;
+            
+            const choiceLabel = document.createElement('label');
+            choiceLabel.htmlFor = `choice${index}`;
+            choiceLabel.textContent = choice;
+
+            choiceElem.appendChild(choiceInput);
+            choiceElem.appendChild(choiceLabel);
+            choicesElem.appendChild(choiceElem);
+        });
+
+        container.appendChild(questionElem);
+        container.appendChild(choicesElem);
+    }
+
+    function nextQuestion() {
+        const selectedChoice = document.querySelector('input[name="choice"]:checked');
+        if (!selectedChoice) {
+            alert("Veuillez sélectionner une réponse !");
+            return;
+        }
+
+        selectedAnswers.push(parseInt(selectedChoice.value));
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showSummary();
+        }
+    }
+
+    function showSummary() {
+        document.getElementById('quiz-container').style.display = 'none';
+        const summary = document.getElementById('summary');
+        summary.style.display = 'block';
+
+        const summaryList = document.getElementById('summary-list');
+        summaryList.innerHTML = '';
+
+        let correctAnswers = 0;
+
+        quizData.forEach((q, index) => {
+            const summaryItem = document.createElement('li');
+            summaryItem.innerHTML = `
+                <strong>${q.question}</strong><br>
+                <div style="text-align: left; margin-left: 20%;">
+                    Votre réponse: ${q.choices[selectedAnswers[index]]} - 
+                    ${selectedAnswers[index] === q.correct ? '<span class="correct">Correct</span>' : '<span class="incorrect">Incorrect</span>'}<br>
+                    Bonne réponse: ${q.choices[q.correct]}
+                </div>
+            `;
+            summaryList.appendChild(summaryItem);
+            if (selectedAnswers[index] === q.correct) {
+                correctAnswers++;
+            }
+        });
+
+        document.getElementById('score').textContent = `Score: ${correctAnswers} / ${quizData.length}`;
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        selectedAnswers = [];
+        document.getElementById('summary').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
